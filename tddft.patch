@@ -1,0 +1,28 @@
+--- tddft.src	2016-06-07 18:37:40.000000000 +0300
++++ tddft_new.src	2018-02-17 20:50:29.399847652 +0300
+@@ -2341,6 +2341,8 @@
+ C
+       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+       PARAMETER (ZERO=0.0D+00,ONE=1.0D+00)
++      LOGICAL MASWRK
++      COMMON /PAR   / ME,MASTER,NPROC,IBTYP,IPTIM,GOPARR,DSKWRK,MASWRK
+       COMMON /IOFILE/ IR,IW,IP,IS,IPK,IDAF,NAV,IODA(950)
+       COMMON /XYZPRP/ XP,YP,ZP,
+      *                DMX,DMY,DMZ,
+@@ -2379,6 +2381,16 @@
+ C
+        CALL DGEMM('N','N',L1,LX,LX,ONE,V,L1,TDEN,LX,ZERO,SCR,L1)
+        CALL DGEMM('N','T',L1,L1,LX,ONE,SCR,L1,V,L1,ZERO,TDEN,L1)
++
++C     -- WRITE TDEN IN AO's
++      IF(MASWRK) THEN
++         WRITE(IW,*) '-------------------------'
++         WRITE(IW,*) 'TRANSITION DENSITY MATRIX'
++         WRITE(IW,*) '-------------------------'
++         WRITE(IW,*) 'STATE1=',0,'STATE2=',IST
++         CALL PRSQLE(TDEN,L1,L1,L1)
++      END IF
++      
+ C
+ C     -- TRANSITION DIPOLE
+ C
