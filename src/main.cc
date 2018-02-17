@@ -3,7 +3,7 @@
 
 int main()
 {
-	QM_residue p1("CBB601_libint.out");	
+	QM_residue p1("gamess_example.out");	
 	
 	libint2::initialize();
 	
