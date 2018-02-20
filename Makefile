@@ -7,7 +7,7 @@ LIBINTDIR=/opt/libint
 INCLUDE=-I$(EIGENDIR) -I$(LIBINTDIR)/include -I./include
 LDFLAGS=-L$(LIBINTDIR)/lib -Wl,-Bstatic -lint2 -Wl,-Bdynamic -lpthread 
 
-OBJ=obj/main.o obj/properties.o obj/qm_residue.o
+OBJ=obj/main.o obj/properties.o obj/qm_residue.o obj/grid.o obj/algebra.o
 
 all: tresp
 

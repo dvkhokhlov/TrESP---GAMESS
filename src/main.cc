@@ -14,6 +14,8 @@ int main()
 	
 	polyhedron35 ico;
 	
-	ico.print();
+	ico.tesselate();
+	
+	std::cout << ico;
 	
 }

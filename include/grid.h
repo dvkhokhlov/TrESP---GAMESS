@@ -1,8 +1,9 @@
 #ifndef GRID_H_INCLUDED
 #define GRID_H_INCLUDED
 
-#include <fstream>
 #include <iostream>
+#include <iomanip>
+#include <cassert>
 #include <string>
 #include <stdexcept>
 #include <vector>
@@ -10,43 +11,32 @@
 #include <limits>
 #include <ctgmath>
 #include <array>
+#include <algorithm>
+
+#include "algebra.h"
 
 struct edge
 {
 	bool dividedQ;
-	size_t v1, v2;
+	size_t spawned_v;
+	std::array<size_t,2> v;
 };
 
 struct face
-{
-	size_t v1, v2, v3;
+{	
+	std::array<size_t, 3> e;
 };
 
 class polyhedron35 
 {
 	public:
 	
-	polyhedron35() : vertices()
-	{
-		std::vector<double> edges(30);
-		std::vector<double> faces(20);
-		
-		std::array<double,3> crd{0., 1., t};
-		
-		for(size_t i = 0; i < 3; i++)
-			for(size_t k = 0; k < 2; k++)
-				for(size_t l = 0; l < 2; l++){
-					std::array<double,3> crd2{crd[0], powm1(crd[1], k), powm1(crd[2], l)};
-					vertices.push_back(std::array<double,3> {crd2[i%3], crd2[(i+1)%3], crd2[(i+2)%3]});
-		}
-				
-	};
+	// initialize unit icosahedron
+	polyhedron35();
 	
-	void print()
-	{
-		for(auto& vertex_i : vertices)
-			std::cout << vertex_i[0] << ' ' << vertex_i[1] << ' ' << vertex_i[2] << std::endl;
-	}
+	friend std::ostream& operator<< (std::ostream& os, const polyhedron35& p);
+	
+	void tesselate();
 	
 	private:
 	inline double powm1 (double a, int pow)
@@ -54,7 +44,16 @@ class polyhedron35
 		return pow%2 ? -a : a;
 	}
 	
-	double t = (1. + sqrt(5.))/2.;
+	void gen_edges();
+	void gen_faces();
+	
+	const size_t nvert0 = 12;
+	const size_t nedge0 = 30;
+	const size_t nface0 = 20;
+	const double unit_len2 = 4.;
+	const double t = (1. + sqrt(5.))/2.;
+	const double r = sqrt(1. + t*t);
+	
 	std::vector<std::array<double,3>> vertices;
 	std::vector<edge> edges;
 	std::vector<face> faces;
