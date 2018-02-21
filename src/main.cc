@@ -14,26 +14,13 @@ int main()
 	
 	polyhedron35 ico;
 	
-	ico.tesselate();
-	ico.tesselate();
-	ico.tesselate();
-	ico.tesselate();
-	ico.tesselate();
-	ico.tesselate();
+	ico.n_tesselate(10);
 	
 	//std::cout << ico;
 
 
 	std::ofstream file;
-	file.open("/home/daniilkh/ico.csv");
-	
-	for(auto& vertex_i : ico.vertices){
-		for(size_t j = 0; j < 3; j++){
-			file.width(10);
-			file.precision(6);
-			if(j < 2) file << vertex_i[j] << ",";
-			else file << vertex_i[j];
-		}
-		file<<std::endl;
-	}
+	file.open("ico.csv");
+
+	file << ico;
 }

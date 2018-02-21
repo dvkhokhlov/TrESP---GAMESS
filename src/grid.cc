@@ -1,4 +1,12 @@
 #include "grid.h"
+inline double powm1 (double a, int pow)
+{
+	return pow%2 ? -a : a;
+}
+
+static double t = (1. + sqrt(5.))/2.;
+static double unit_len2 = 4.;
+static double r_spher = sqrt(1. + t*t);
 
 polyhedron35::polyhedron35()
 {
@@ -11,15 +19,15 @@ polyhedron35::polyhedron35()
 				vertices.push_back(std::array<double,3> {crd2[i%3], crd2[(i+1)%3], crd2[(i+2)%3]});
 	}
 	
-	adj_mtx.resize(nvert0);
+	auto nvertex = vertices.size();
+	adj_mtx.resize(nvertex);
+	
 	for(size_t i = 0, size = vertices.size(); i < size; i++){
 		for(size_t j = i + 1; j < size; j++){
 			if(fabs(dist2(vertices[i], vertices[j]) - unit_len2) < 1E-6)
 				adj_mtx[i].push_back(j);
 		}
 	}	
-
-			
 }
 
 
@@ -32,6 +40,7 @@ void polyhedron35::tesselate()
 			auto& edge2 = adj_mtx[i][j]; 
 			
 			auto p = mid_v(vertices[i], vertices[edge2]);
+			dscal(p, r_spher/norm(p));
 			vertices.push_back(p);
 						
 			neigh[i].push_back(vertices.size() - 1);			
@@ -108,6 +117,22 @@ void polyhedron35::tesselate()
 
 	adj_mtx = adj_mtx_new;
 }
+
+void polyhedron35::n_tesselate(size_t n)
+{
+	assert(n < 11ul);
+	
+	for(size_t i = 0; i < n; i++)
+		tesselate();
+}
+
+void polyhedron35::tesselate_to(size_t n)
+{
+	assert(n < 10000000ul);
+	while(vertices.size() < n)
+		tesselate();
+}
+
 
 std::ostream& operator<< (std::ostream& os, const polyhedron35& p)
 {
