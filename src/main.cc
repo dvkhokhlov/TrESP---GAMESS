@@ -4,17 +4,20 @@
 
 int main()
 {
-//	QM_residue p1("tests/gms_chlb.out");	
+	QM_residue p1("tests/gms_7amc.out");	
 	
-	//libint2::initialize();
+	libint2::initialize();
 	
-//	v_calc(p1.get_basis(), p1.get_dm());
+	qd_calc(p1.get_basis(), p1.get_dm());
+	v_calc(p1.get_basis(), p1.get_dm());
 	
-	//libint2::finalize();
-	
+	libint2::finalize();
+
+/*	
 	polyhedron35 ico;
 	
-	ico.n_tesselate(10);
+	
+	ico.n_tesselate(4);
 	
 	//std::cout << ico;
 
@@ -23,4 +26,5 @@ int main()
 	file.open("ico.csv");
 
 	file << ico;
+	*/
 }

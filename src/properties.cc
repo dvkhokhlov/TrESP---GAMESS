@@ -29,18 +29,15 @@ omp_set_num_threads(nthreads);
 }
 
 
-/*
-void qd_calc (QM_residue& A){
+
+void qd_calc (std::vector<libint2::Shell>& obs, Square_Matrix& dm){
 		
-	auto max_nprim = BasisSet::max_nprim(A.basis);
-	auto max_l = BasisSet::max_l(A.basis);
-		
-	const std::vector<libint2::Shell>& obs = A.basis;	
-	initialize();
+	auto max_nprim = libint2::BasisSet::max_nprim(obs);
+	auto max_l = libint2::BasisSet::max_l(obs);
+			
+	libint2::Engine s_engine(libint2::Operator::emultipole1, max_nprim, max_l);
 	
-	Engine s_engine(Operator::emultipole1, max_nprim, max_l);
-	
-	auto shell2bf = BasisSet::compute_shell2bf(A.basis);
+	auto shell2bf = libint2::BasisSet::compute_shell2bf(obs);
 	
 	const auto& buf_vec = s_engine.results();
 	const auto tstart = std::chrono::high_resolution_clock::now();
@@ -64,10 +61,10 @@ void qd_calc (QM_residue& A){
 		// this iterates over integrals in this order
 		for(size_t f1=0; f1!=n1; ++f1){
 			for(size_t f2=0; f2!=n2; ++f2){				
-				q += A.dm01(bf1 + f1, bf2 + f2)*s_shellset[f1*n2 + f2];
-				dx += A.dm01(bf1 + f1, bf2 + f2)*x_shellset[f1*n2 + f2];
-				dy += A.dm01(bf1 + f1, bf2 + f2)*y_shellset[f1*n2 + f2];
-				dz += A.dm01(bf1 + f1, bf2 + f2)*z_shellset[f1*n2 + f2];
+				q += dm(bf1 + f1, bf2 + f2)*s_shellset[f1*n2 + f2];
+				dx += dm(bf1 + f1, bf2 + f2)*x_shellset[f1*n2 + f2];
+				dy += dm(bf1 + f1, bf2 + f2)*y_shellset[f1*n2 + f2];
+				dz += dm(bf1 + f1, bf2 + f2)*z_shellset[f1*n2 + f2];
 			}
 		}
 		}
@@ -80,9 +77,8 @@ void qd_calc (QM_residue& A){
     std::cout << "d = {" << dx << ',' << dy << ',' << dz << '}' << std::endl;
     std::cout << "done (" << time_elapsed.count() << " s)" << std::endl;
 	
-	finalize();
 }
-*/
+
 
 void v_calc (std::vector<libint2::Shell>& obs, Square_Matrix& dm){
 	

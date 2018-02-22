@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <thread>
 
+void qd_calc (std::vector<libint2::Shell>& obs, Square_Matrix& dm);
 void v_calc (std::vector<libint2::Shell>& obs, Square_Matrix& dm);
 
 #endif

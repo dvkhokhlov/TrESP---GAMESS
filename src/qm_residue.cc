@@ -323,8 +323,8 @@ void QM_residue::resort_dm ()
 
 void QM_residue::read_ecxprp ()
 {
-	const size_t GMS_DM_STRIDE = 15;
-	const size_t GMS_DM_WIDTH = 11;
+	const size_t GMS_DM_STRIDE = 19;
+	const size_t GMS_DM_WIDTH = 17;
 	const size_t GMS_NCOL_DM = 5;
 	
 	if(qm_file && parsQ){

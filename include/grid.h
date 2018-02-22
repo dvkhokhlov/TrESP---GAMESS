@@ -21,7 +21,6 @@ class polyhedron35
 	// initialize unit icosahedron
 	polyhedron35();
 	
-	
 	friend std::ostream& operator<< (std::ostream& os, const polyhedron35& p);
 
 	void n_tesselate(size_t);
