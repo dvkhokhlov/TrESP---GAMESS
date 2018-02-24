@@ -87,16 +87,26 @@ void QM_residue::read_atoms(){
 			throw std::runtime_error ("QM_residue.read_atoms(): geometry block not found");
 		}
 		
-		atoms.resize (natom);
+//		atoms.resize (natom);
 		
 		std::getline(qm_file, tmp);
 		
-		for(auto& atom : atoms){
+		for(size_t i = 0; i < natom; i++){
 			std::getline(qm_file, tmp);
-			atom.atomic_number = std::stoul (tmp.substr(GMS_CHRG_STRIDE, GMS_CHRG_WIDTH));
-			atom.x = std::stod (tmp.substr(GMS_RX_STRIDE, GMS_R_WIDTH));
-			atom.y = std::stod (tmp.substr(GMS_RY_STRIDE, GMS_R_WIDTH));
-			atom.z = std::stod (tmp.substr(GMS_RZ_STRIDE, GMS_R_WIDTH));
+			
+			auto atomic_number = std::stoi (tmp.substr(GMS_CHRG_STRIDE, GMS_CHRG_WIDTH));
+			auto x = std::stod (tmp.substr(GMS_RX_STRIDE, GMS_R_WIDTH));
+			auto y = std::stod (tmp.substr(GMS_RY_STRIDE, GMS_R_WIDTH));
+			auto z = std::stod (tmp.substr(GMS_RZ_STRIDE, GMS_R_WIDTH));
+			
+			atoms.push_back(
+							{atomic_number, {x, y, z}}
+							);
+
+//			atom.atomic_number = std::stoul (tmp.substr(GMS_CHRG_STRIDE, GMS_CHRG_WIDTH));
+//			atom.x = std::stod (tmp.substr(GMS_RX_STRIDE, GMS_R_WIDTH));
+//			atom.y = std::stod (tmp.substr(GMS_RY_STRIDE, GMS_R_WIDTH));
+//			atom.z = std::stod (tmp.substr(GMS_RZ_STRIDE, GMS_R_WIDTH));
 			
 //			std::cout << atom.atomic_number << ' ' << atom.x << ' ' << atom.y << ' ' << atom.z << std::endl;
 		}
@@ -152,7 +162,7 @@ void QM_residue::read_shell (const std::streampos& p_beg, const std::streampos& 
             {
 				{am, pure, coeffs_0}
             },
-            {{atoms[n].x, atoms[n].y, atoms[n].z}}
+            {{atoms[n].r[0], atoms[n].r[1], atoms[n].r[2]}}
 		}
 	);
 	
@@ -163,7 +173,7 @@ void QM_residue::read_shell (const std::streampos& p_beg, const std::streampos& 
 				{
 					{1, pure, coeffs_1}
 				},
-				{{atoms[n].x, atoms[n].y, atoms[n].z}}
+				{{atoms[n].r[0], atoms[n].r[1], atoms[n].r[2]}}
 			}
 		);
 	}	
@@ -377,5 +387,20 @@ void QM_residue::read_ecxprp ()
 		if(!parsQ) throw std::runtime_error ("QM_residue.read_ecxprp(): read parameters before");
 	}
 
+}
+
+Square_Matrix& QM_residue::get_dm()
+{
+	return dm01;
+}	
+
+const std::vector<libint2::Shell>& QM_residue::get_basis()
+{
+	return basis;
+}
+
+const std::vector<Atom>& QM_residue::get_atoms()
+{
+	return atoms;
 }
 

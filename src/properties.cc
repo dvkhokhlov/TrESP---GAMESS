@@ -30,7 +30,7 @@ omp_set_num_threads(nthreads);
 
 
 
-void qd_calc (std::vector<libint2::Shell>& obs, Square_Matrix& dm){
+void qd_calc (const std::vector<libint2::Shell>& obs, Square_Matrix& dm){
 		
 	auto max_nprim = libint2::BasisSet::max_nprim(obs);
 	auto max_l = libint2::BasisSet::max_l(obs);
@@ -80,7 +80,7 @@ void qd_calc (std::vector<libint2::Shell>& obs, Square_Matrix& dm){
 }
 
 
-void v_calc (std::vector<libint2::Shell>& obs, Square_Matrix& dm){
+std::vector<double> v_calc (const std::vector<std::array<double,3>> points, const std::vector<libint2::Shell>& obs, Square_Matrix& dm){
 	
 	auto nthreads_cstr = getenv("LIBINT_NUM_THREADS");
     libint2::nthreads = 1;
@@ -89,18 +89,7 @@ void v_calc (std::vector<libint2::Shell>& obs, Square_Matrix& dm){
     iss >> libint2::nthreads;
     if (libint2::nthreads > 1 << 16 || libint2::nthreads <= 0) libint2::nthreads = 1;
 	}
-	
-	size_t npoint{1000};
-	
-	std::random_device r;
-	std::default_random_engine e1(10);
-    std::uniform_real_distribution<double> uniform_distR(-100., 100.);
-	
-	std::vector<std::array<double, 3>> coords(npoint);
-	for(auto& coord : coords){
-		coord = {uniform_distR(e1),  uniform_distR(e1),  uniform_distR(e1)};
-	}
-		
+			
 	auto max_nprim = libint2::BasisSet::max_nprim(obs);
 	auto max_l = libint2::BasisSet::max_l(obs);
 				
@@ -112,23 +101,24 @@ void v_calc (std::vector<libint2::Shell>& obs, Square_Matrix& dm){
 	
 	auto shell2bf= libint2::BasisSet::compute_shell2bf(obs);
 	
+	std::vector<double> v(points.size());
+	
 	auto v_lambda = [&](size_t thread_id) {
-		double v;
 		engines[thread_id] = libint2::Engine(libint2::Operator::nuclear, max_nprim, max_l);
 		auto shell2bf = libint2::BasisSet::compute_shell2bf(obs);
 		const auto& buf_vec = engines[thread_id].results();
 			
-		for(size_t w = 0; w < npoint; w++){
+		for(size_t w = 0, w_max = points.size(); w < w_max; w++){
 			if(!(w%100) && !thread_id) std::cout << w << " points done" << std::endl;
 			if(w%libint2::nthreads != thread_id) continue;
 											
 			std::vector<std::pair<double, std::array<double, 3>>> p{
 																		{1., 
-																		{coords[w][0], coords[w][1], coords[w][2]}}
+																		{points[w][0], points[w][1], points[w][2]}}
 																	};
 			engines[thread_id].set_params(p);
 			
-			v = 0.;
+			v[w] = 0.;
 			for(size_t s1 = 0, s1max = obs.size(); s1 != s1max; s1++) {
 				auto bf1 = shell2bf[s1];  
 				auto n1 = obs[s1].size(); 
@@ -144,7 +134,7 @@ void v_calc (std::vector<libint2::Shell>& obs, Square_Matrix& dm){
 					// this iterates over integrals in this order
 					for(size_t f1 = 0; f1 != n1; f1++){
 						for(size_t f2 = 0; f2 != n2; f2++){				
-							v += dm(bf1 + f1, bf2 + f2)*v_shellset[f1*n2 + f2];
+							v[w] += dm(bf1 + f1, bf2 + f2)*v_shellset[f1*n2 + f2];
 						}
 					}
 					
@@ -165,4 +155,5 @@ void v_calc (std::vector<libint2::Shell>& obs, Square_Matrix& dm){
     
     std::cout << "done (" << time_elapsed.count() << " s)" << std::endl;
           
+    return v;
 }

@@ -11,6 +11,7 @@
 #include <memory>
 #include <limits>
 #include <ctgmath>
+#include "chemistry.h"
 
 struct Square_Matrix 
 {
@@ -41,44 +42,37 @@ class QM_residue
 	
 	~QM_residue() = default;
 	
-	inline std::vector<libint2::Shell>& get_basis()
-	{
-		return basis;
-	}
-	
-	inline Square_Matrix& get_dm()
-	{
-		return dm01;
-	}	
-	
-	friend void qd_calc (QM_residue&);
-//	friend double v_calc1 (QM_residue&);
-//	friend double v_calc2 (QM_residue&);
+// getters
+	const std::vector<libint2::Shell>& get_basis();
+	const std::vector<Atom>& get_atoms();
+	Square_Matrix& get_dm();
 	
 	private:
-	// add reading mode!
-	bool pure = false;
-	
+// residue data	
 	size_t natom;
 	size_t ncgto;
 	size_t nshell;
-	
-	std::string qm_fname;
-		
 	std::vector<libint2::Shell> basis;
-	std::vector<libint2::Atom> atoms;
-	
+	std::vector<Atom> atoms;
 	Square_Matrix dm01;
-
-// auxiliary functions/variables
+	
+// TODO: add reading mode!
+	bool pure = false;
+	
+// strings/IO variables	
 	bool parsQ = false;
 	std::string tmp;
+	std::string qm_fname;
 	std::ifstream qm_file;
+	
+// auxiliary functions for IO
 	void read_shell (const std::streampos&, const std::streampos&, size_t atom);	
 	void read_pars ();
 	void read_atoms();
 	void read_basis ();
 	void read_ecxprp ();
+	
+// resort and renormalize density matrix
 	void resort_dm ();
 };
 
