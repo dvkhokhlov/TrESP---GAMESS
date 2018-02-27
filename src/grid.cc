@@ -199,7 +199,7 @@ grid::grid(const std::vector<std::array<double,3>>& sphere, double r_spher)
 	}
 }
 
-grid::grid(const std::vector<std::array<double,3>>& sphere, const double r_spher, const std::vector<Atom> atoms)
+grid::grid(const std::vector<std::array<double,3>>& sphere, const double r_spher, const std::vector<Atom>& atoms)
 {
 	// non-symmetrical sparce adjacency matrix
 	// interatomic distance = Ri*(vdwscl + (nlayer - 1)*vdwinc) + Rj*(vdwscl)

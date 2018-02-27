@@ -43,7 +43,7 @@ class grid
 {
 	public:
 	grid(const std::vector<std::array<double,3>>& sphere, double r_spher);
-	grid(const std::vector<std::array<double,3>>& sphere, const double r_spher, const std::vector<Atom> atoms);
+	grid(const std::vector<std::array<double,3>>& sphere, const double r_spher, const std::vector<Atom>& atoms);
 	
 	const std::vector<std::array<double,3>>& get_points(){
 		return points;

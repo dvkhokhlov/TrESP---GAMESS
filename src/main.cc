@@ -1,6 +1,7 @@
 #include "qm_residue.h"
 #include "properties.h"
 #include "grid.h"
+#include "fit.h"
 
 int main()
 {
@@ -23,8 +24,15 @@ int main()
 	
 	libint2::finalize();
 	
+	fit esp_engine;
 	
-// write	
+	auto esp = esp_engine(p1.get_atoms(), grid0.get_points(), v);
+	
+	for(size_t i = 0, i_max = esp.size(); i < i_max; i++)
+		std::cout << esp[i] << std::endl;
+		
+// write
+/*	
 	std::ofstream file;
 	file.open("grid.txt");
 
@@ -32,5 +40,5 @@ int main()
 	for(size_t i = 0, i_max = grid0.size(); i < i_max; i++){
 		file << pts[i][0] << ' ' << pts[i][1] << ' ' << pts[i][2] << ' ' << v[i] << std::endl;
 	}
-	
+	*/
 }
