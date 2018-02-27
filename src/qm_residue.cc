@@ -341,7 +341,8 @@ void QM_residue::read_ecxprp ()
 		
 		qm_file.seekg(0, qm_file.beg);
 		
-		dm01.resize(ncgto);
+//		dm01.resize(ncgto);
+		dm01.resize(ncgto, ncgto);
 		
 		bool dmQ = false;
 		while(std::getline(qm_file, tmp)){
@@ -389,7 +390,8 @@ void QM_residue::read_ecxprp ()
 
 }
 
-Square_Matrix& QM_residue::get_dm()
+//Square_Matrix& QM_residue::get_dm()
+Eigen::MatrixXd& QM_residue::get_dm()
 {
 	return dm01;
 }	

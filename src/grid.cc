@@ -33,6 +33,30 @@ polyhedron35::polyhedron35()
 	}	
 }
 
+polyhedron35::polyhedron35(size_t tess_order)
+{
+	std::array<double,3> crd{0., 1., t};
+	
+	for(size_t i = 0; i < 3; i++)
+		for(size_t k = 0; k < 2; k++)
+			for(size_t l = 0; l < 2; l++){
+				std::array<double,3> crd2{crd[0], powm1(crd[1], k), powm1(crd[2], l)};
+				vertices.push_back(std::array<double,3> {crd2[i%3], crd2[(i+1)%3], crd2[(i+2)%3]});
+	}
+	
+	auto nvertex = vertices.size();
+	adj_mtx.resize(nvertex);
+	
+	for(size_t i = 0, size = vertices.size(); i < size; i++){
+		for(size_t j = i + 1; j < size; j++){
+			if(fabs(dist2(vertices[i], vertices[j]) - unit_len2) < 1E-6)
+				adj_mtx[i].push_back(j);
+		}
+	}
+	
+	n_tesselate(tess_order);	
+}
+
 
 void polyhedron35::tesselate()
 {

@@ -3,6 +3,8 @@
 
 #include "libint2.hpp"
 
+#include <Eigen/Dense>
+
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -12,7 +14,7 @@
 #include <limits>
 #include <ctgmath>
 #include "chemistry.h"
-
+/*
 struct Square_Matrix 
 {
 	Square_Matrix() = default;
@@ -32,7 +34,7 @@ struct Square_Matrix
 	size_t size;
 	std::vector<double> m;
 };
-
+*/
 class QM_residue
 {
 	public:
@@ -45,7 +47,8 @@ class QM_residue
 // getters
 	const std::vector<libint2::Shell>& get_basis();
 	const std::vector<Atom>& get_atoms();
-	Square_Matrix& get_dm();
+//	Square_Matrix& get_dm();
+	Eigen::MatrixXd& get_dm();
 	
 	private:
 // residue data	
@@ -54,7 +57,9 @@ class QM_residue
 	size_t nshell;
 	std::vector<libint2::Shell> basis;
 	std::vector<Atom> atoms;
-	Square_Matrix dm01;
+//	Square_Matrix dm01;
+	Eigen::MatrixXd dm01;
+
 	
 // TODO: add reading mode!
 	bool pure = false;

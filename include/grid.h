@@ -20,6 +20,7 @@ class polyhedron35
 {
 	public:
 	polyhedron35();
+	polyhedron35(size_t);
 	
 	friend std::ostream& operator<< (std::ostream& os, const polyhedron35& p);
 

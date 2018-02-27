@@ -4,22 +4,27 @@
 
 int main()
 {
-
+// read QM file
 	QM_residue p1("tests/gms_7amc.out");	
 	
-	polyhedron35 ico;
-	ico.n_tesselate(3);
-	
+// make grid
+	polyhedron35 ico(3);
 	grid grid0(ico.get_vertices(), ico.r_spher, p1.get_atoms());
-	
+		
+//libint 
 	libint2::initialize();
 	
-	qd_calc(p1.get_basis(), p1.get_dm());
+	qm_prop engine(p1.get_basis(), p1.get_dm());
 	
-	auto v = v_calc(grid0.get_points(), p1.get_basis(), p1.get_dm());
+	double q;
+	std::array<double, 3> d;
+	std::tie(q, d) = engine.qd_calc();
+	auto v = engine.v_calc(grid0.get_points());
 	
 	libint2::finalize();
 	
+	
+// write	
 	std::ofstream file;
 	file.open("grid.txt");
 
