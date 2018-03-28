@@ -26,7 +26,7 @@ class qm_prop{
 	}
 	
 	std::tuple<double, std::array<double,3>> qd_calc ();
-	std::vector<double> v_calc (const std::vector<std::array<double,3>> points);
+	std::vector<double> v_calc (const std::vector<std::array<double,3>>& points);
 	
 	
 	private:

@@ -58,7 +58,7 @@ std::tuple<double, std::array<double,3>> qm_prop::qd_calc ()
 }
 
 
-std::vector<double> qm_prop::v_calc (const std::vector<std::array<double,3>> points)
+std::vector<double> qm_prop::v_calc (const std::vector<std::array<double,3>>& points)
 {
 	auto max_nprim = libint2::BasisSet::max_nprim(obs);
 	auto max_l = libint2::BasisSet::max_l(obs);
