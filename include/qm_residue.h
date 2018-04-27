@@ -40,7 +40,7 @@ class QM_residue
 	public:
 	// constructors
 	QM_residue() = delete;
-	QM_residue(const std::string& _qm_fname);
+	QM_residue(const std::string& _qm_fname, size_t nstate=1);
 	
 	~QM_residue() = default;
 	
@@ -48,9 +48,12 @@ class QM_residue
 	const std::vector<libint2::Shell>& get_basis();
 	const std::vector<Atom>& get_atoms();
 //	Square_Matrix& get_dm();
-	Eigen::MatrixXd& get_dm();
+	Eigen::MatrixXd& get_dm(size_t);
 	
 	private:
+//
+	size_t nstate;
+	
 // residue data	
 	size_t natom;
 	size_t ncgto;
@@ -58,7 +61,7 @@ class QM_residue
 	std::vector<libint2::Shell> basis;
 	std::vector<Atom> atoms;
 //	Square_Matrix dm01;
-	Eigen::MatrixXd dm01;
+	std::vector<Eigen::MatrixXd> dm;
 
 	
 // TODO: add reading mode!
@@ -75,10 +78,10 @@ class QM_residue
 	void read_pars ();
 	void read_atoms();
 	void read_basis ();
-	void read_ecxprp ();
+	void read_ecxprp (size_t);
 	
 // resort and renormalize density matrix
-	void resort_dm ();
+	void resort_dm (size_t);
 };
 
 #endif

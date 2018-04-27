@@ -58,7 +58,7 @@ class grid
 	private:
 	double vdwscl = 1.4;
 	double vdwinc = 0.2;
-	size_t nlayer = 6;
+	size_t nlayer = 4;
 	
 	std::vector<std::array<double,3>> points;
 };
