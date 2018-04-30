@@ -1,6 +1,6 @@
 #include "qm_residue.h"
 
-QM_residue::QM_residue(const std::string& _qm_fname, size_t _nstate) : qm_fname(_qm_fname), nstate(_nstate), dm(_nstate)
+QM_residue::QM_residue(const std::string& _qm_fname, size_t _nstate) : nstate(_nstate), dm(_nstate), qm_fname(_qm_fname)
 {
 	qm_file.open (qm_fname);
 	if(!qm_file){
@@ -335,8 +335,13 @@ void QM_residue::resort_dm (size_t st)
 
 void QM_residue::read_ecxprp (size_t st)
 {
+#ifdef LDENS	
 	const size_t GMS_DM_STRIDE = 19;
 	const size_t GMS_DM_WIDTH = 17;
+#else
+	const size_t GMS_DM_STRIDE = 15;
+	const size_t GMS_DM_WIDTH = 11;
+#endif
 	const size_t GMS_NCOL_DM = 5;
 	
 	if(qm_file && parsQ){
@@ -397,7 +402,13 @@ void QM_residue::read_ecxprp (size_t st)
 Eigen::MatrixXd& QM_residue::get_dm(size_t st)
 {
 	return dm[st];
+}
+
+std::vector<Eigen::MatrixXd>& QM_residue::get_dms()
+{
+	return dm;
 }	
+	
 
 const std::vector<libint2::Shell>& QM_residue::get_basis()
 {

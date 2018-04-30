@@ -14,7 +14,7 @@
 class qm_prop{
 	public:
 //	qm_prop(const std::vector<libint2::Shell>& _obs, Square_Matrix& _dm) : obs(_obs), dm(_dm)
-	qm_prop(const std::vector<libint2::Shell>& _obs, Eigen::MatrixXd& _dm) : obs(_obs), dm(_dm)
+	qm_prop(const std::vector<libint2::Shell>& _obs, std::vector<Eigen::MatrixXd>& _dms) : obs(_obs), dms(_dms)
 	{
 		auto nthreads_cstr = getenv("LIBINT_NUM_THREADS");
 		nthreads = 1;
@@ -25,15 +25,16 @@ class qm_prop{
 		}
 	}
 	
-	std::tuple<double, std::array<double,3>> qd_calc ();
-	std::vector<double> v_calc (const std::vector<std::array<double,3>>& points);
-	
+	std::vector<std::tuple<double, std::array<double,3>>> qd_calc ();
+	std::vector<std::vector<double>> v_calc (const std::vector<std::array<double,3>>& points);
+	std::vector<std::array<double,3>> l_calc ();
+	std::vector<std::array<double,3>> p_calc ();
 	
 	private:
 	int nthreads;
 	const std::vector<libint2::Shell>& obs;
 //	Square_Matrix& dm;
-	Eigen::MatrixXd& dm;
+	std::vector<Eigen::MatrixXd>& dms;
 };
 
 #endif

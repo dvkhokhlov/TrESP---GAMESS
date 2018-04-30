@@ -19,19 +19,19 @@ class fit{
             for(const auto& point : points){
                 A(i,j) += 1.0/(dist(point, atoms[i].r)*dist(point, atoms[j].r));
             }
-            A(j, i) = A (i, j);
+            A(j, i) = A(i, j);
         }
     }
 	
 	X.resize(dim);
-	for(size_t i = 0; i < dim;i++){
+	for(size_t i = 0; i < dim; i++){
 		X[i]=0.;
         for(size_t h = 0, h_max = points.size(); h < h_max; h++){
             X[i] += V[h]/dist(points[h], atoms[i].r);
         }
     }
     
-    return A.ldlt().solve(X);
+    return A.fullPivHouseholderQr().solve(X);
     
 	}
 	

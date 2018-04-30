@@ -47,8 +47,8 @@ class QM_residue
 // getters
 	const std::vector<libint2::Shell>& get_basis();
 	const std::vector<Atom>& get_atoms();
-//	Square_Matrix& get_dm();
 	Eigen::MatrixXd& get_dm(size_t);
+	std::vector<Eigen::MatrixXd>& get_dms();
 	
 	private:
 //

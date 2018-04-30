@@ -13,6 +13,14 @@ void dscal (std::array<double, N>& a, double b)
 }
 
 template <size_t N>
+double dot (std::array<double, N>& a, std::array<double, N>& b)
+{		
+	double dot = 0.;
+	for(size_t i = 0; i < N; i++) dot += a[i]*b[i];
+	return dot;
+}
+
+template <size_t N>
 double norm (const std::array<double, N>& a)
 {		
 	double norm = 0.;
