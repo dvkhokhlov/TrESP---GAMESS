@@ -95,3 +95,24 @@
  C     -- TRANSITION DIPOLE
  C
 
+--- trnstn.src	2018-06-06 18:00:50.573119371 +0300
++++ trnstn.src.new	2018-06-06 18:00:38.952578430 +0300
+@@ -2395,7 +2395,16 @@
+  460  CONTINUE
+ C
+       CALL DAWRIT(IDAF,IODA,TDM,L2,250,0)
+-C
++
++C     -- WRITE TDEN IN AO's
++      IF(MASWRK) THEN
++         WRITE(IW,*) '-------------------------'
++         WRITE(IW,*) 'DENSITY MATRIX'
++         WRITE(IW,*) '-------------------------'
++         WRITE(IW,*) 'STATE1=',IRT1-1,'STATE2=',IRT2-1
++         CALL PRTRIL(TDM,L1)
++      END IF
++      
+       IF(MASWRK  .AND.  DBG) THEN
+          WRITE(IW,9010)
+          TDX=TRACEP(TDM,DAOX,L1)*DEBYE
+

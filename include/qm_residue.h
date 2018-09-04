@@ -40,7 +40,7 @@ class QM_residue
 	public:
 	// constructors
 	QM_residue() = delete;
-	QM_residue(const std::string& _qm_fname, size_t nstate=1);
+	QM_residue(const std::string& _qm_fname, size_t nstate, const std::string& _method);
 	
 	~QM_residue() = default;
 	
@@ -78,7 +78,8 @@ class QM_residue
 	void read_pars ();
 	void read_atoms();
 	void read_basis ();
-	void read_ecxprp (size_t);
+	void read_ecxprp_mcscf (size_t);
+	void read_ecxprp_tddft (size_t);
 	
 // resort and renormalize density matrix
 	void resort_dm (size_t);

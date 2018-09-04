@@ -284,7 +284,8 @@ std::vector<std::array<double,3>> qm_prop::l_calc ()
 						for(auto& mtx : s1_s2){
 							auto orb_pos = phi_minus(am, j, mtx.first[2]);
 							if(orb_pos != -1){
-								mtx.second(i, j) += shset_map[mtx.first[0]][i*aux_shell_minus.size() + orb_pos];
+								if(n2 == 6 && (j == 0 || j == 3 || j == 5)) mtx.second(i, j) += 2.*shset_map[mtx.first[0]][i*aux_shell_minus.size() + orb_pos];
+								else mtx.second(i, j) += shset_map[mtx.first[0]][i*aux_shell_minus.size() + orb_pos];
 							}
 						}
 				}
@@ -444,7 +445,8 @@ std::vector<std::array<double,3>> qm_prop::p_calc ()
 						for(auto& mtx : s1_s2){
 							auto orb_pos = phi_minus(am, j, mtx.first[1]);
 							if(orb_pos != -1){
-								mtx.second(i, j) += shset_map[i*aux_shell_minus.size() + orb_pos];
+								if(n2 == 6 && (j == 0 || j == 3 || j == 5)) mtx.second(i, j) += 2.*shset_map[i*aux_shell_minus.size() + orb_pos];
+								else mtx.second(i, j) += shset_map[i*aux_shell_minus.size() + orb_pos];
 							}
 						}
 				}

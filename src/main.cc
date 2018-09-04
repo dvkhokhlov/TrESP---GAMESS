@@ -12,25 +12,34 @@ int main(int argc, char *argv[])
 {
 	std::string inpfile;
 	std::string outfile;
+	std::string method;
 	size_t nstate = 1;
 	for(size_t i = 0; i < static_cast<size_t>(argc); ++i){
         if(std::string{argv[i]} == "-inp"){
-			inpfile = std::string{argv[i+1]} + ".out";
+			auto tmp = std::string{argv[i+1]};
+			if(tmp.substr(tmp.size() - 3, 3) == "out"){inpfile = tmp;}
+			else{inpfile = tmp + ".out";}
 			outfile = std::string{argv[i+1]} + ".esp";
 		}
 		if(std::string{argv[i]} == "-nst"){
 			nstate = atol(argv[i+1]);
 			if(nstate < 0) nstate = 1;
 		}
+		if(std::string{argv[i]} == "-qm"){
+			method = std::string{argv[i+1]};
+		}
     }
+    
+    if(method != "mcscf" && method != "tddft")
+		throw std::runtime_error("unknown QM method");
     
     std::cout << nstate << std::endl;
    
 	// read QM file
-	QM_residue p1(inpfile, nstate);	
+	QM_residue p1(inpfile, nstate, method);	
 	
 // make grid
-	polyhedron35 ico(3);
+	polyhedron35 ico(2);
 	grid grid0(ico.get_vertices(), ico.r_spher, p1.get_atoms());
 
 	std::cout << "npoints = " << grid0.size() << std::endl;
@@ -72,6 +81,11 @@ int main(int argc, char *argv[])
 	
 // write output
 	FILE* f = fopen(outfile.c_str(), "w");
+	
+	if(!f){
+		throw std::runtime_error("cannot open file for write");
+	}
+	
 	const auto& atoms = p1.get_atoms();
 	
 	fprintf(f, "everything is in atomic units\n\n\n"); 

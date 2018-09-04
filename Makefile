@@ -13,10 +13,14 @@ all: tresp
 
 tresp: $(OBJ)
 	$(CC) $^  $(LDFLAGS) -o $@
-	
+
+tresp_bu: $(OBJ)
+	$(CC) $^  $(LDFLAGS) -o $@
+
 obj/%.o: src/%.cc 
 	$(CC) -c $(CFLAGS) $(INCLUDE) $< -o $@
 
 clean:
 	rm -rf $(OBJ)
 	rm -rf tresp
+

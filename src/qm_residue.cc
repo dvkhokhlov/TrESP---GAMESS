@@ -1,6 +1,6 @@
 #include "qm_residue.h"
 
-QM_residue::QM_residue(const std::string& _qm_fname, size_t _nstate) : nstate(_nstate), dm(_nstate), qm_fname(_qm_fname)
+QM_residue::QM_residue(const std::string& _qm_fname, size_t _nstate, const std::string& _method) : nstate(_nstate), dm(_nstate), qm_fname(_qm_fname)
 {
 	qm_file.open (qm_fname);
 	if(!qm_file){
@@ -11,9 +11,13 @@ QM_residue::QM_residue(const std::string& _qm_fname, size_t _nstate) : nstate(_n
 		read_pars();
 		read_atoms();
 		read_basis();
-		for(size_t i = 0; i < nstate; ++i){
-			read_ecxprp(i);
+		if(_method == "mcscf"){
+			for(size_t i = 0; i < nstate; ++i) read_ecxprp_mcscf(i);
 		}
+		if(_method == "tddft"){
+			for(size_t i = 0; i < nstate; ++i) read_ecxprp_tddft(i);
+		}
+
 	}
 	catch (const std::exception &e){
 		std::cerr << e.what() << std::endl;
@@ -304,12 +308,13 @@ void QM_residue::resort_dm (size_t st)
 			size_t ngss1 = ((am1 + 1)*(am1 + 2))/2;
 			size_t ngss2 = ((am2 + 1)*(am2 + 2))/2;
 
+/*
 			for(size_t k = 0; k < ngss1; k++){
 				for(size_t l = 0; l < ngss2; l++){
 					dm[st](norb1 + k, norb2 + l) *= pow(2., -0.5);
 				}
 			}			
-			
+*/			
 			if(am1 > 1 || am2 > 1){
 				double tmp[ngss1][ngss2];
 				
@@ -333,7 +338,7 @@ void QM_residue::resort_dm (size_t st)
 	
 }
 
-void QM_residue::read_ecxprp (size_t st)
+void QM_residue::read_ecxprp_tddft (size_t st)
 {
 #ifdef LDENS	
 	const size_t GMS_DM_STRIDE = 19;
@@ -348,7 +353,6 @@ void QM_residue::read_ecxprp (size_t st)
 		
 		qm_file.seekg(0, qm_file.beg);
 		
-//		dm[st].resize(ncgto);
 		dm[st].resize(ncgto, ncgto);
 		
 		bool dmQ = false;
@@ -366,10 +370,10 @@ void QM_residue::read_ecxprp (size_t st)
 		for(size_t i = 0; i < nblk; i++){
 			
 			for(size_t j = 0; j < 3; j++) std::getline(qm_file, tmp);
-			
+					
 			for(size_t j = 0; j < ncgto; j++){
 				std::getline(qm_file, tmp);
-				
+							
 				for(size_t k = 0; k < GMS_NCOL_DM; k++){
 					auto dm_i = std::stod(tmp.substr(GMS_DM_STRIDE + k*GMS_DM_WIDTH, GMS_DM_WIDTH));
 					dm[st](j, GMS_NCOL_DM*i + k) = dm_i;
@@ -385,6 +389,82 @@ void QM_residue::read_ecxprp (size_t st)
 				
 			for(size_t k = 0; k < ncgto%GMS_NCOL_DM; k++){
 				dm[st](i, GMS_NCOL_DM*nblk + k) = std::stod(tmp.substr(GMS_DM_STRIDE + k*GMS_DM_WIDTH, GMS_DM_WIDTH));
+			}
+		}
+		
+		resort_dm (st);	
+		
+		dm[st] *= pow(2, -0.5);
+	}
+	else{
+		if(!qm_file) throw std::runtime_error ("QM_residue.read_ecxprp(): QM file stream closed");
+		if(!parsQ) throw std::runtime_error ("QM_residue.read_ecxprp(): read parameters before");
+	}
+
+}
+
+void QM_residue::read_ecxprp_mcscf (size_t st)
+{
+#ifdef LDENS	
+	const size_t GMS_DM_STRIDE = 19;
+	const size_t GMS_DM_WIDTH = 17;
+#else
+	const size_t GMS_DM_STRIDE = 15;
+	const size_t GMS_DM_WIDTH = 11;
+#endif
+	const size_t GMS_NCOL_DM = 5;
+	
+	if(qm_file && parsQ){
+		
+		qm_file.seekg(0, qm_file.beg);
+		
+		dm[st].resize(ncgto, ncgto);
+		
+		bool dmQ = false;
+		while(std::getline(qm_file, tmp)){
+			std::string head = " STATE1=                    0 STATE2=                    " + std::to_string(st+1);
+			if(!tmp.compare(0, head.size(), head)){
+				dmQ = true;
+				break;
+			}
+		}
+		
+		if(!dmQ) throw std::runtime_error ("QM_residue.read_ecxprp(): DM not found");
+		
+		size_t nblk = ncgto/GMS_NCOL_DM;
+		auto nrow = ncgto;
+		for(size_t i = 0; i < nblk; i++){
+			
+			for(size_t j = 0; j < 3; j++) std::getline(qm_file, tmp);
+					
+			for(size_t j = 0; j < nrow; j++){
+				std::getline(qm_file, tmp);
+				
+				auto ncol = GMS_NCOL_DM;
+				if(j < GMS_NCOL_DM){
+					ncol = j + 1;
+				}
+				
+				for(size_t k = 0; k < ncol; k++){
+					auto dm_i = std::stod(tmp.substr(GMS_DM_STRIDE + k*GMS_DM_WIDTH, GMS_DM_WIDTH));
+
+					dm[st](j + GMS_NCOL_DM*i, GMS_NCOL_DM*i + k) = dm_i;
+					dm[st](GMS_NCOL_DM*i + k, j + GMS_NCOL_DM*i) = dm_i;
+				}
+				
+			}
+			nrow -= GMS_NCOL_DM;
+		}
+		
+		for(size_t i = 0; i < 3; i++) std::getline(qm_file, tmp);
+		
+		for(size_t i = 0; i < ncgto%GMS_NCOL_DM; i++){
+			std::getline(qm_file, tmp);
+			
+			auto ncol = i + 1;
+			for(size_t k = 0; k < ncol; k++){
+				dm[st](i + GMS_NCOL_DM*nblk, GMS_NCOL_DM*nblk + k) = std::stod(tmp.substr(GMS_DM_STRIDE + k*GMS_DM_WIDTH, GMS_DM_WIDTH));
+				dm[st](GMS_NCOL_DM*nblk + k, i + GMS_NCOL_DM*nblk) = std::stod(tmp.substr(GMS_DM_STRIDE + k*GMS_DM_WIDTH, GMS_DM_WIDTH));
 			}
 		}
 		
